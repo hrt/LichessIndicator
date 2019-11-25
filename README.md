@@ -1,0 +1,1 @@
+A [tampermonkey](https://www.tampermonkey.net/) script that will show the live game score in your perspective (window title) and play a sound whenever a large change in momentum occurs in the game. E.g. a blunder by either you or your opponent.
