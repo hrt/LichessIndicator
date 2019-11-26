@@ -54,6 +54,7 @@ var db=[Vx,Dq,Jq,Gr,Hr,Rr,Sr,Vx];var eb=[Wx,Lk,Qk,Uk,ge,Uh,Vh,_h,ai,Gi,bl,gl,kl,
 		dy = 8 - dy;
 		if (player === 1) {
 			dx = 8 - dx;
+			dy = 8 - dy;
 		}
 		circle.setAttribute('cx', (container.offsetWidth/8) * dx);
 		circle.setAttribute('cy', (container.offsetHeight/8) * dy);
@@ -105,7 +106,7 @@ var db=[Vx,Dq,Jq,Gr,Hr,Rr,Sr,Vx];var eb=[Wx,Lk,Qk,Uk,ge,Uh,Vh,_h,ai,Gi,bl,gl,kl,
 
 	function notifyStockfish(fen) {
 		let svg = document.getElementsByTagName('svg')[0];
-		circles.forEach(e => svg.removeChild(e));
+		circles.forEach(e => e.remove());
 		circles = [];
 		stockfish.postMessage("position fen " + fen);
 		stockfish.postMessage("go depth " + depth);
