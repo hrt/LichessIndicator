@@ -37,10 +37,33 @@ var db=[Vx,Dq,Jq,Gr,Hr,Rr,Sr,Vx];var eb=[Wx,Lk,Qk,Uk,ge,Uh,Vh,_h,ai,Gi,bl,gl,kl,
 	const depth = 8;
 	let lastScore = 0;
 	let playerToMove = 0;
+	let circles = [];
 
-	stockfish.onmessage = function(event) {
-    	console.log(event);
-	    if (typeof event == "string" && event.includes("info depth " + depth))
+	function drawCircle(position) {
+		console.log(position);
+		let svg = document.getElementsByTagName('svg')[0];
+		let container = document.getElementsByTagName('cg-container')[0];
+		let circle = document.createElementNS(svg.namespaceURI, 'circle');
+		circle.setAttribute('r', '39.84375');
+		circle.setAttribute('opacity', '1');
+		circle.setAttribute('fill', 'none');
+		circle.setAttribute('stroke-width', '5.3125');
+		circle.setAttribute('stroke', '#15781B');
+		let dx = (position.charCodeAt(0) - 'a'.charCodeAt(0) + 0.5);
+		let dy = (position.charAt(1) - 0.5);
+		dy = 8 - dy;
+		if (player === 1) {
+			dx = 8 - dx;
+		}
+		circle.setAttribute('cx', (container.offsetWidth/8) * dx);
+		circle.setAttribute('cy', (container.offsetHeight/8) * dy);
+		console.log(circle);
+		svg.appendChild(circle);
+		circles.push(circle);
+	}
+
+	stockfish.onmessage = function(event) {	
+    if (typeof event == "string" && event.includes("info depth " + depth))
 	    {
 	    	let score = +event.match(/score cp (-?\d+)/)[1];
 	    	if (player !== playerToMove) {
@@ -52,6 +75,10 @@ var db=[Vx,Dq,Jq,Gr,Hr,Rr,Sr,Vx];var eb=[Wx,Lk,Qk,Uk,ge,Uh,Vh,_h,ai,Gi,bl,gl,kl,
 	    	}
     		document.title = score;
 	    	lastScore = score;
+
+	    	let moves = event.match(/pv ([a-h][1-8])\w*([a-h][1-8])/);
+	    	drawCircle(moves[1]);
+	    	drawCircle(moves[2]);
 	    }
 	};
 
@@ -77,6 +104,9 @@ var db=[Vx,Dq,Jq,Gr,Hr,Rr,Sr,Vx];var eb=[Wx,Lk,Qk,Uk,ge,Uh,Vh,_h,ai,Gi,bl,gl,kl,
 	}
 
 	function notifyStockfish(fen) {
+		let svg = document.getElementsByTagName('svg')[0];
+		circles.forEach(e => svg.removeChild(e));
+		circles = [];
 		stockfish.postMessage("position fen " + fen);
 		stockfish.postMessage("go depth " + depth);
 	}
