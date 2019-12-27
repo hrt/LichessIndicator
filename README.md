@@ -1,1 +1,1 @@
-A [tampermonkey](https://www.tampermonkey.net/) script that will show the live game score in your perspective (window title) and play a sound whenever a large change in momentum occurs in the game. E.g. a blunder by either you or your opponent.
+A [tampermonkey](https://www.tampermonkey.net/) script that hints which piece to move (rather than the actual move) in real time. Good for spotting blunders and improving your chess.

@@ -37,10 +37,9 @@ var db=[Vx,Dq,Jq,Gr,Hr,Rr,Sr,Vx];var eb=[Wx,Lk,Qk,Uk,ge,Uh,Vh,_h,ai,Gi,bl,gl,kl,
 	const depth = 8;
 	let lastScore = 0;
 	let playerToMove = 0;
-	let circles = [];
+	let shapes = [];
 
 	function drawCircle(position) {
-		console.log(position);
 		let svg = document.getElementsByTagName('svg')[0];
 		let container = document.getElementsByTagName('cg-container')[0];
 		let circle = document.createElementNS(svg.namespaceURI, 'circle');
@@ -58,9 +57,56 @@ var db=[Vx,Dq,Jq,Gr,Hr,Rr,Sr,Vx];var eb=[Wx,Lk,Qk,Uk,ge,Uh,Vh,_h,ai,Gi,bl,gl,kl,
 		}
 		circle.setAttribute('cx', (container.offsetWidth/8) * dx);
 		circle.setAttribute('cy', (container.offsetHeight/8) * dy);
-		console.log(circle);
 		svg.appendChild(circle);
-		circles.push(circle);
+		shapes.push(circle);
+	}
+
+	function drawLine(from, to) {
+		let container = document.getElementsByTagName('cg-container')[0];
+		let svg = document.getElementsByTagName('svg')[0];
+		let defs = svg.children[0];
+		let marker = document.createElementNS(svg.namespaceURI, 'marker');
+		marker.setAttribute('id', 'arrowhead');
+		marker.setAttribute('orient', 'auto');
+		marker.setAttribute('markerWidth', '4');
+		marker.setAttribute('markerHeight', '8');
+		marker.setAttribute('refX', '2.05');
+		marker.setAttribute('refY', '2.01');
+		let path = document.createElementNS(svg.namespaceURI, 'path');
+		path.setAttribute('d', 'M0,0 V4 L3,2 Z');
+		path.setAttribute('fill', '#15781B');
+		marker.appendChild(path);
+		defs.appendChild(marker);
+		shapes.push(marker);
+
+		let line = document.createElementNS(svg.namespaceURI, 'line');
+		line.setAttribute('opacity', '1');
+		line.setAttribute('stroke-linecap', 'round');
+		line.setAttribute('marker-end', 'url(#arrowhead)');
+		line.setAttribute('stroke-width', '13.28125');
+		line.setAttribute('stroke', '#15781B');
+		let x1 = (from.charCodeAt(0) - 'a'.charCodeAt(0) + 0.5);
+		let y1 = (from.charAt(1) - 0.5);
+		y1 = 8 - y1;
+		if (player === 1) {
+			x1 = 8 - x1;
+			y1 = 8 - y1;
+		}
+		line.setAttribute('x1', (container.offsetWidth/8) * x1);
+		line.setAttribute('y1', (container.offsetHeight/8) * y1);
+
+		let x2 = (to.charCodeAt(0) - 'a'.charCodeAt(0) + 0.5);
+		let y2 = (to.charAt(1) - 0.5);
+		y2 = 8 - y2;
+		if (player === 1) {
+			x2 = 8 - x2;
+			y2 = 8 - y2;
+		}
+		line.setAttribute('x2', (container.offsetWidth/8) * x2);
+		line.setAttribute('y2', (container.offsetHeight/8) * y2);
+
+		svg.appendChild(line);
+		shapes.push(line);
 	}
 
 	stockfish.onmessage = function(event) {	
@@ -70,16 +116,13 @@ var db=[Vx,Dq,Jq,Gr,Hr,Rr,Sr,Vx];var eb=[Wx,Lk,Qk,Uk,ge,Uh,Vh,_h,ai,Gi,bl,gl,kl,
 	    	if (player !== playerToMove) {
 	    		score = -score;
 	    	}
-	    	console.log(score);
-	    	if (Math.abs(lastScore - score) > 200) {
-	    		lichess.sound.berserk();
-	    	}
     		document.title = score;
-	    	lastScore = score;
-
-	    	let moves = event.match(/pv ([a-h][1-8])\w*([a-h][1-8])/);
+	    	let moves = event.match(/pv ([a-h][1-8])\w*([a-h][1-8]) ([a-h][1-8])\w*([a-h][1-8]) ([a-h][1-8])\w*([a-h][1-8]) ([a-h][1-8])\w*([a-h][1-8]) ([a-h][1-8])\w*([a-h][1-8]) ([a-h][1-8])\w*([a-h][1-8]) ([a-h][1-8])\w*([a-h][1-8])/);
 	    	drawCircle(moves[1]);
-	    	drawCircle(moves[2]);
+	    	// for (var i = 1; i < moves.length; i+=4) {
+	    		// drawLine(moves[i], moves[i+1]);
+	    	// }
+	    	lastScore = score;
 	    }
 	};
 
@@ -106,8 +149,8 @@ var db=[Vx,Dq,Jq,Gr,Hr,Rr,Sr,Vx];var eb=[Wx,Lk,Qk,Uk,ge,Uh,Vh,_h,ai,Gi,bl,gl,kl,
 
 	function notifyStockfish(fen) {
 		let svg = document.getElementsByTagName('svg')[0];
-		circles.forEach(e => e.remove());
-		circles = [];
+		shapes.forEach(e => e.remove());
+		shapes = [];
 		stockfish.postMessage("position fen " + fen);
 		stockfish.postMessage("go depth " + depth);
 	}
